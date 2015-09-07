@@ -10,6 +10,11 @@
 
 @implementation CEMovieMaker
 
+- (void)setFrameTimes:(NSArray *)frameTimes {
+    _frameTimes = frameTimes;
+}
+
+
 - (instancetype)initWithSettings:(NSDictionary *)videoSettings;
 {
     self = [self init];
@@ -55,6 +60,10 @@
 
 - (void)createMovieFromImages:(NSArray *)images withCompletion:(CEMovieMakerCompletion)completion;
 {
+    if (self.frameTimes){
+        NSParameterAssert(self.frameTimes.count == images.count);
+    }
+
     self.completionBlock = completion;
     
     [self.assetWriter startWriting];
@@ -81,6 +90,12 @@
                     }else{
                         CMTime lastTime = CMTimeMake(i-1, self.frameTime.timescale);
                         CMTime presentTime = CMTimeAdd(lastTime, self.frameTime);
+                        // use custom timestamps
+                        if(self.frameTimes){
+                            CMTime t;
+                            [self.frameTimes[i] getValue:&t];
+                            presentTime = t;
+                        };
                         [self.bufferAdapter appendPixelBuffer:sampleBuffer withPresentationTime:presentTime];
                     }
                     CFRelease(sampleBuffer);

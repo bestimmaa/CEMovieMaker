@@ -8,20 +8,20 @@
 
 #import "ViewController.h"
 #import "CEMovieMaker.h"
+
 @import MediaPlayer;
 
 @interface ViewController ()
 
-@property (nonatomic, strong) CEMovieMaker *movieMaker;
+@property(nonatomic, strong) CEMovieMaker *movieMaker;
 
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[UIImage imageNamed:@"icon2"] forState:UIControlStateNormal];
     [button setFrame:CGRectMake(0, 0, self.view.bounds.size.width, 100)];
@@ -30,29 +30,38 @@
     [self.view addSubview:button];
 }
 
-- (void)process:(id)sender
-{
+- (void)process:(id)sender {
     NSMutableArray *frames = [[NSMutableArray alloc] init];
-    
+
     UIImage *icon1 = [UIImage imageNamed:@"icon1"];
     UIImage *icon2 = [UIImage imageNamed:@"icon2"];
     UIImage *icon3 = [UIImage imageNamed:@"icon3"];
-    
+
     NSDictionary *settings = [CEMovieMaker videoSettingsWithCodec:AVVideoCodecH264 withWidth:icon1.size.width andHeight:icon1.size.height];
     self.movieMaker = [[CEMovieMaker alloc] initWithSettings:settings];
-    for (NSInteger i = 0; i < 10; i++) {
-        [frames addObject:icon1];
-        [frames addObject:icon2];
-        [frames addObject:icon3];
-    }
+    NSMutableArray *frameTimes = [NSMutableArray array];
+    [frames addObject:icon1];
+    [frames addObject:icon2];
+    [frames addObject:icon3];
 
-    [self.movieMaker createMovieFromImages:[frames copy] withCompletion:^(NSURL *fileURL){
+    CMTime frameTime = CMTimeMakeWithSeconds(0, NSEC_PER_SEC);
+    NSValue *vFrameTime = [NSValue valueWithCMTime:frameTime];
+    [frameTimes addObject:vFrameTime];
+    frameTime = CMTimeMakeWithSeconds(0.35, NSEC_PER_SEC);
+    vFrameTime = [NSValue valueWithCMTime:frameTime];
+    [frameTimes addObject:vFrameTime];
+    frameTime = CMTimeMakeWithSeconds(3, NSEC_PER_SEC);
+    vFrameTime = [NSValue valueWithCMTime:frameTime];
+    [frameTimes addObject:vFrameTime];
+
+    [self.movieMaker setFrameTimes:frameTimes];
+
+    [self.movieMaker createMovieFromImages:[frames copy] withCompletion:^(NSURL *fileURL) {
         [self viewMovieAtUrl:fileURL];
     }];
 }
 
-- (void)viewMovieAtUrl:(NSURL *)fileURL
-{
+- (void)viewMovieAtUrl:(NSURL *)fileURL {
     MPMoviePlayerViewController *playerController = [[MPMoviePlayerViewController alloc] initWithContentURL:fileURL];
     [playerController.view setFrame:self.view.bounds];
     [self presentMoviePlayerViewControllerAnimated:playerController];

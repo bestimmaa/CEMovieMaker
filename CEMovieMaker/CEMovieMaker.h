@@ -19,6 +19,7 @@ typedef void(^CEMovieMakerCompletion)(NSURL *fileURL);
 @property (nonatomic, strong) AVAssetWriterInputPixelBufferAdaptor *bufferAdapter;
 @property (nonatomic, strong) NSDictionary *videoSettings;
 @property (nonatomic, assign) CMTime frameTime;
+@property (nonatomic, strong) NSArray *frameTimes;
 @property (nonatomic, strong) NSURL *fileURL;
 @property (nonatomic, copy) CEMovieMakerCompletion completionBlock;
 
